@@ -38,14 +38,13 @@ configuration = Configuration(access_token=CHANNEL_ACCESS_TOKEN)
 user_sessions = {}
 
 def get_font(size):
-    """取得中文字型"""
+    """取得中文字型，優先載入專案目錄下的 font.ttf"""
     font_paths = [
-        "fonts/GenSenRounded-B.ttc",
-        "fonts/NotoSansTC-Bold.otf",
-        "C:/Windows/Fonts/msjhbd.ttc",
-        "C:/Windows/Fonts/msjh.ttc",
-        "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
-        "/System/Library/Fonts/PingFang.ttc"
+        "font.ttf",                         # 專案根目錄下的思源黑體
+        "fonts/font.ttf",                   # fonts 資料夾
+        "fonts/GenSenRounded-B.ttc",        # 自訂字型
+        "C:/Windows/Fonts/msjhbd.ttc",       # 本機微軟正黑體
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
     ]
     for path in font_paths:
         if os.path.exists(path):
