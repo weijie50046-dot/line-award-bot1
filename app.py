@@ -37,21 +37,41 @@ configuration = Configuration(access_token=CHANNEL_ACCESS_TOKEN)
 # 暫存每個使用者的最新狀態：包含文案、最後上傳的照片、最近一次使用的風格
 user_sessions = {}
 
+import urllib.request
+
 def get_font(size):
-    """取得中文字型，優先載入專案目錄下的 font.ttf"""
+    """取得中文字型：優先尋找本地字型，若無則自動下載開源思源黑體"""
+    font_path = "font.ttf"
+    
+    # 如果本地沒有 font.ttf，自動從開源鏡像下載一份思源黑體
+    if not os.path.exists(font_path):
+        try:
+            print("正在自動下載思源黑體繁體中文...")
+            font_url = "https://raw.githubusercontent.com/google/fonts/main/ofl/notosanstc/NotoSansTC%5Bwght%5D.ttf"
+            urllib.request.urlretrieve(font_url, font_path)
+            print("字型下載完成！")
+        except Exception as e:
+            print(f"字型下載失敗: {e}")
+
+    # 檢查可用字型路徑清單
     font_paths = [
-        "font.ttf",                         # 專案根目錄下的思源黑體
-        "fonts/font.ttf",                   # fonts 資料夾
-        "fonts/GenSenRounded-B.ttc",        # 自訂字型
-        "C:/Windows/Fonts/msjhbd.ttc",       # 本機微軟正黑體
-        "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
+        font_path,
+        "/usr/share/fonts/truetype/noto/NotoSansTC-Regular.otf",
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "C:/Windows/Fonts/msjhbd.ttc",
+        "C:/Windows/Fonts/msjh.ttc",
+        "/System/Library/Fonts/PingFang.ttc"
     ]
+    
     for path in font_paths:
         if os.path.exists(path):
             try:
                 return ImageFont.truetype(path, size)
-            except Exception:
+            except Exception as e:
+                print(f"載入字型 {path} 失敗: {e}")
                 continue
+                
+    # 若全都找不到，退回預設字型
     return ImageFont.load_default()
 
 def ask_ai_to_expand_copy(user_input: str) -> dict:
